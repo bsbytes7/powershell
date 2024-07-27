@@ -1,0 +1,26 @@
+# Get the directory where the script is located
+$scriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
+
+# Define the search pattern for files with no extension
+$searchPattern = "*.*"  # This pattern matches all files
+
+# Check if the script directory exists
+if (Test-Path $scriptDir) {
+    # Get all files in the directory and subdirectories
+    $filesToDelete = Get-ChildItem -Path $scriptDir -Filter $searchPattern -Recurse -File -ErrorAction SilentlyContinue
+
+    # Loop through each file and check if it is a shortcut
+    foreach ($file in $filesToDelete) {
+        if ($file.Extension -eq "" -or $file.Extension -eq ".lnk") {
+            try {
+                Remove-Item -Path $file.FullName -Force
+                Write-Output "Deleted file: $($file.FullName)"
+            }
+            catch {
+                Write-Error "Failed to delete file: $($file.FullName) - $_"
+            }
+        }
+    }
+} else {
+    Write-Error "Script directory does not exist: $scriptDir"
+}
