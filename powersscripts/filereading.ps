@@ -1,0 +1,21 @@
+# Get the directory where the script is located
+$scriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
+
+# Check if the script directory exists
+if (Test-Path $scriptDir) {
+    # Get all directories in the script directory
+    $directories = Get-ChildItem -Path $scriptDir -Directory
+
+    # Loop through each directory and remove it
+    foreach ($dir in $directories) {
+        try {
+            Remove-Item -Path $dir.FullName -Recurse -Force
+            Write-Output "Deleted: $($dir.FullName)"
+        }
+        catch {
+            Write-Error "Failed to delete: $($dir.FullName) - $_"
+        }
+    }
+} else {
+    Write-Error "Script directory does not exist: $scriptDir"
+}
